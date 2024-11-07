@@ -1,3 +1,5 @@
+from maze_drawer import matrix_to_image
+
 class GeneticAlgorithm:
     def __init__(self, init_population, environment, epochs:int, pop_size: int, fitness: callable, crossover: callable, mutation: callable):
         """_summary_
@@ -36,8 +38,8 @@ class GeneticAlgorithm:
 
             first_individual = population[individual_idx]
             second_individual = population[nxt_individual_idx]
-            new_individual = self.crossover(first_individual, second_individual)
-            new_individual = self.mutation(new_individual)
+            new_individual = self.crossover(first_individual, second_individual, self.environment)
+            new_individual = self.mutation(new_individual, self.environment)
 
             new_generation.append(new_individual)
 

@@ -12,6 +12,8 @@ class PathGenerator:
         self.visited = set()
         self.paths = []
 
+        random.seed(42)
+
     def generate_paths(self, path_no: int):
         for _ in range(path_no):
             self.generate_path()        
