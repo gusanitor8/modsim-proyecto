@@ -20,14 +20,20 @@ class GeneticAlgorithm:
         self.crossover = crossover
         self.mutation = mutation
         self.pop_size = pop_size
+        self.generations = []
     
     def run(self):
         population = self.init_population
+        # Add the initial population to the generations list
+        self.generations.append(population)
+
         for _ in range(self.epochs):
             population.sort(key=lambda x: self.fitness(x, self.environment))
             population = self.reproduce(population)
-            
-        return population
+            # Add the new population to the generations list
+            self.generations.append(population)
+
+        return self.generations
 
     def reproduce(self, population):
         pop_len = len(population)

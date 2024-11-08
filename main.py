@@ -5,9 +5,12 @@ from genetic_algorithm import GeneticAlgorithm
 import pickle
 from path_genetic import fitness, mutation, crossover
 import random
+from animator import MazeSolver
+import pygame
 
 EPOCHS = 100
 POPULATION = 10
+
 
 
 if __name__ == "__main__":
@@ -41,21 +44,30 @@ if __name__ == "__main__":
     checkpoints = maze_dic["checkpoints"]
 
     # Convert the matrix to an image
-    maze_image = matrix_to_image(maze_matrix, entry_position, exit_position, cell_size=20, checkpoints=checkpoints)
-    maze_image.show()  # Display the maze image
-    maze_image.save("out/maze_output.png")  # Save the maze image
+    # maze_image = matrix_to_image(maze_matrix, entry_position, exit_position, cell_size=20, checkpoints=checkpoints)
+    # maze_image.show()  # Display the maze image
+    # maze_image.save("out/maze_output.png")  # Save the maze image
 
     path_gen = PathGenerator(maze_matrix, entry_position)
     path_gen.generate_paths(POPULATION)
     paths = path_gen.get_paths()
     
-    maze_image = matrix_to_image(maze_matrix, entry_position, exit_position, cell_size=20, path=paths[0])    
-    maze_image.save("out/maze_output_path.png")  # Save the maze image
+    # maze_image = matrix_to_image(maze_matrix, entry_position, exit_position, cell_size=20, path=paths[0])    
+    # maze_image.save("out/maze_output_path.png")  # Save the maze image
     
     genetic = GeneticAlgorithm(paths, maze_dic, EPOCHS, POPULATION, fitness, crossover, mutation)
-    new_population = genetic.run()
+    generations = genetic.run()
 
     # display solution
-    maze_image = matrix_to_image(maze_matrix, entry_position, exit_position, cell_size=20, path=new_population[0])
-    maze_image.show()  # Display the maze image
-    maze_image.save("out/solution.png") 
+    # maze_image = matrix_to_image(maze_matrix, entry_position, exit_position, cell_size=20, path=new_population[0])
+    # maze_image.show()  # Display the maze image
+    # maze_image.save("out/solution.png") 
+
+    pygame.init()
+    screen = pygame.display.set_mode((800, 600))  # Ajusta el tamaño según tu laberinto
+    clock = pygame.time.Clock()
+
+    solver = MazeSolver(maze_matrix, generations, screen, clock)
+    solver.run_animation()
+
+    pygame.quit()
