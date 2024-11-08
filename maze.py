@@ -1,4 +1,5 @@
-import random 
+import random
+import matplotlib.pyplot as plt
 from constants import WALL, PATH
 
 class MazeGenerator:
@@ -63,7 +64,21 @@ class MazeGenerator:
         self.maze[self.entry[1]][self.entry[0]] = 'S'  # Start point
         self.maze[self.exit[1]][self.exit[0]] = 'E'  # End point
 
-    def display_maze(self):
-        """Print the maze to the console."""
-        for row in self.maze:
-            print("".join(row))
+    def display_maze(self, checkpoints=False):
+        """Display the maze with start and end points in different colors."""
+        # Display the maze
+        plt.imshow(self.maze, cmap="binary", interpolation="nearest")
+        
+        # Mark the start point (green) and end point (red)
+        start_x, start_y = self.entry
+        end_x, end_y = self.exit
+        plt.scatter(start_x, start_y, color='green', s=100, label='Start')  # Green for start
+        plt.scatter(end_x, end_y, color='red', s=100, label='End')          # Red for end
+
+        # Optionally display the checkpoints in a different color (e.g., blue)
+        if checkpoints:
+            for checkpoint in self.checkpoints:
+                plt.scatter(checkpoint[0], checkpoint[1], color='blue', s=50, alpha=0.5)
+
+        plt.axis("off")  # Hide the axes
+        plt.show()
