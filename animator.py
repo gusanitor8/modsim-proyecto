@@ -42,6 +42,10 @@ class MazeSolver:
         self.offset_y = self.top_margin + (self.available_height - self.maze_draw_height) / 2
 
     def draw_maze(self):
+        # Coordenadas de la salida y la meta
+        start_pos = (1, 1)
+        end_pos = (self.maze_height - 2, self.maze_width - 2)
+
         # Dibuja el laberinto centrado en la pantalla
         for x, row in enumerate(self.maze):
             for y, cell in enumerate(row):
@@ -53,6 +57,24 @@ class MazeSolver:
                     self.cell_size + 1   # Añade 1 píxel a la altura
                 )
                 pygame.draw.rect(self.screen, color, rect)
+
+        # Dibuja la salida en verde
+        start_rect = pygame.Rect(
+            self.offset_x + start_pos[0] * self.cell_size,
+            self.offset_y + start_pos[1] * self.cell_size,
+            self.cell_size + 1,
+            self.cell_size + 1
+        )
+        pygame.draw.rect(self.screen, (0, 255, 0), start_rect)  # Verde
+
+        # Dibuja la meta en rojo
+        end_rect = pygame.Rect(
+            self.offset_x + end_pos[0] * self.cell_size,
+            self.offset_y + end_pos[1] * self.cell_size,
+            self.cell_size + 1,
+            self.cell_size + 1
+        )
+        pygame.draw.rect(self.screen, (255, 0, 0), end_rect)  # Rojo
 
     def display_top_text(self):
         # Muestra el título con menos padding
