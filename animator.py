@@ -83,6 +83,7 @@ class MazeSolver:
         )
         pygame.draw.rect(self.screen, RED, end_rect)  # Rojo
 
+
     def display_top_text(self):
         # Muestra el título con menos padding
         n = self.maze_width
@@ -98,7 +99,7 @@ class MazeSolver:
         self.screen.blit(generation_text, generation_rect)
 
 
-    def animate_generation(self, population, generation_number):
+    def animate_generation(self, population, generation_number, speed):
         agents = []
         # Crear "agentes" para cada camino en la población, asignando un frame de inicio escalonado
         for i, path in enumerate(population):
@@ -145,23 +146,59 @@ class MazeSolver:
                     )
 
             pygame.display.flip()  # Actualiza la pantalla
-            self.clock.tick(20)  # Controla la velocidad de la animación
-            time.sleep(0.02)  # Pausa breve para suavizar la animación
+            self.clock.tick(speed)  # Controla la velocidad de la animación
+            time.sleep(0.01)  # Pausa breve para suavizar la animación
             step += 1  # Incrementa el contador de frames
 
+
     def run_animation(self):
-        pygame.display.set_caption("Solucionador de Laberintos con Algoritmos Genéticos")  # Título de la ventana
-        running = True
-        for generation_number, generation in enumerate(self.generations, start=1):
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                    break
-            if not running:
+        pygame.display.set_caption("Solucionador de Laberintos con Algoritmos Genéticos")
+        total_generations = len(self.generations)
+        
+        # Determinar las generaciones a mostrar
+        generations_to_show = []
+        if total_generations > 1:
+            generations_to_show.append(0)  # Primera generación
+            if total_generations > 2:
+                generations_to_show.append(1)  # Segunda generación
+            if total_generations > 3:
+                generations_to_show.append(2)  # Tercera generación
+            if total_generations > 4:
+                generations_to_show.append(total_generations - 3)  # Antepenúltima generación
+            if total_generations > 5:
+                generations_to_show.append(total_generations - 2)  # Penúltima generación
+            if total_generations > 6:
+                generations_to_show.append(total_generations - 1)  # Última generación
+
+            # Añadir 5 generaciones intermedias si el número total de generaciones es suficiente
+            if total_generations > 10:
+                mid_generations = total_generations // 5
+                generations_to_show += [mid_generations * i for i in range(1, 5)]
+
+            generations_to_show = sorted(set(generations_to_show))
+
+        # Loop para animar solo las generaciones seleccionadas con diferentes velocidades
+        for i, generation_number in enumerate(generations_to_show):
+            if generation_number >= total_generations:
                 break
-            self.animate_generation(generation, generation_number)
+            generation = self.generations[generation_number]
+
+            # Definir velocidad de animación según posición de la generación
+            if i == 0 or i == len(generations_to_show) - 1:  # Primera y última
+                speed = 15
+            elif i == 1 or i == len(generations_to_show) - 2:  # Segunda y penúltima
+                speed = 25
+            elif i == 2 or i == len(generations_to_show) - 3:  # Tercera y antepenúltima
+                speed = 35
+            else:  # Generaciones intermedias más rápidas
+                speed = 60
+
+            # Llamar a la animación con la velocidad definida
+            self.animate_generation(generation, generation_number, speed)
             time.sleep(0.5)  # Pausa entre generaciones
+
         # Espera a que el usuario cierre la ventana
+        running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

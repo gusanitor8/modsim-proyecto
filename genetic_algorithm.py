@@ -1,5 +1,3 @@
-from maze_drawer import matrix_to_image
-
 class GeneticAlgorithm:
     def __init__(self, init_population, environment, epochs:int, pop_size: int, fitness: callable, crossover: callable, mutation: callable):
         """_summary_
@@ -21,6 +19,7 @@ class GeneticAlgorithm:
         self.mutation = mutation
         self.pop_size = pop_size
         self.generations = []
+        self.fit_history = []
     
     def run(self):
         population = self.init_population
@@ -28,12 +27,20 @@ class GeneticAlgorithm:
         self.generations.append(population)
 
         for _ in range(self.epochs):
+            # Add the fitness of the population to the fit_history list
+            population_fit = [self.fitness(x, self.environment) for x in population]
+            # Add the fitness of the population to the fit_history list
+            self.fit_history.append(population_fit)
+
+            # Sort the population by fitness
             population.sort(key=lambda x: self.fitness(x, self.environment))
+            # Add the fitness of the population to the fit_history list
             population = self.reproduce(population)
             # Add the new population to the generations list
             self.generations.append(population)
+           
+        return self.generations, self.fit_history
 
-        return self.generations
 
     def reproduce(self, population):
         pop_len = len(population)
