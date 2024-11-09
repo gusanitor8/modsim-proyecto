@@ -1,5 +1,12 @@
 import pygame
 import time
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+GRAY = (113, 121, 126)
 
 class MazeSolver:
     def __init__(self, maze, generations, screen, clock):
@@ -49,7 +56,7 @@ class MazeSolver:
         # Dibuja el laberinto centrado en la pantalla
         for x, row in enumerate(self.maze):
             for y, cell in enumerate(row):
-                color = (255, 255, 255) if cell == 0 else (0, 0, 0)
+                color = GRAY if cell == 0 else BLACK
                 rect = pygame.Rect(
                     self.offset_x + y * self.cell_size,
                     self.offset_y + x * self.cell_size,
@@ -65,7 +72,7 @@ class MazeSolver:
             self.cell_size + 1,
             self.cell_size + 1
         )
-        pygame.draw.rect(self.screen, (0, 255, 0), start_rect)  # Verde
+        pygame.draw.rect(self.screen, GREEN, start_rect)  # Verde
 
         # Dibuja la meta en rojo
         end_rect = pygame.Rect(
@@ -74,40 +81,49 @@ class MazeSolver:
             self.cell_size + 1,
             self.cell_size + 1
         )
-        pygame.draw.rect(self.screen, (255, 0, 0), end_rect)  # Rojo
+        pygame.draw.rect(self.screen, RED, end_rect)  # Rojo
 
     def display_top_text(self):
         # Muestra el título con menos padding
         n = self.maze_width
-        title_text = self.title_font.render(f"Laberinto de {n}x{n} celdas", True, (0, 0, 0))
+        title_text = self.title_font.render(f"Laberinto de {n}x{n} celdas", True, BLACK)
         title_rect = title_text.get_rect(center=(self.screen_width / 2, self.top_margin / 2 - 10))
         self.screen.blit(title_text, title_rect)
 
 
     def display_bottom_text(self, generation_number):
         # Muestra el texto de la generación actual en la parte inferior, centrado y más grande
-        generation_text = self.generation_font.render(f"Generación Actual: {generation_number}", True, (0, 0, 0))
+        generation_text = self.generation_font.render(f"Generación Actual: {generation_number}", True, BLACK)
         generation_rect = generation_text.get_rect(center=(self.screen_width / 2, self.screen_height - self.bottom_margin / 2))
         self.screen.blit(generation_text, generation_rect)
 
 
     def animate_generation(self, population, generation_number):
         agents = []
-        # Crear "agentes" para cada camino en la población
-        for path in population:
-            start_pos = path[0]  # posición inicial de cada camino
-            agents.append({"path": path, "index": 0, "color": (0, 0, 255), "finished": False})
+        # Crear "agentes" para cada camino en la población, asignando un frame de inicio escalonado
+        for i, path in enumerate(population):
+            agents.append({
+                "path": path,
+                "index": 0,
+                "color": BLUE,
+                "finished": False,
+                "start_frame": i  # Cada agente empieza un frame después del anterior
+            })
 
-        # Animar cada paso del camino
-        for step in range(max(len(agent["path"]) for agent in agents)):
-            self.screen.fill((255, 255, 255))  # Limpia la pantalla
+        step = 0  # Contador de frames global para controlar el inicio de cada agente
+        running = True
+        while running:
+            self.screen.fill(GRAY)  # Limpia la pantalla
             self.draw_maze()  # Dibuja el laberinto
             self.display_top_text()  # Muestra el texto superior
             self.display_bottom_text(generation_number)  # Muestra el texto inferior
 
+            running = False  # Este valor se usará para detener el bucle si todos los agentes han terminado
+
             for agent in agents:
-                # Si el agente no ha terminado, sigue avanzando
-                if not agent["finished"]:
+                # Si el agente no ha terminado y ha llegado a su frame de inicio, sigue avanzando
+                if not agent["finished"] and step >= agent["start_frame"]:
+                    running = True  # Al menos un agente sigue en movimiento
                     if agent["index"] < len(agent["path"]):
                         pos = agent["path"][agent["index"]]
                         agent["position"] = pos  # Guarda la posición actual
@@ -115,7 +131,7 @@ class MazeSolver:
                     else:
                         agent["finished"] = True  # Marca el agente como terminado
 
-                # Dibuja el agente en su última posición
+                # Dibuja el agente en su última posición si ya ha comenzado
                 if "position" in agent:
                     pos = agent["position"]
                     pygame.draw.circle(
@@ -131,6 +147,7 @@ class MazeSolver:
             pygame.display.flip()  # Actualiza la pantalla
             self.clock.tick(20)  # Controla la velocidad de la animación
             time.sleep(0.02)  # Pausa breve para suavizar la animación
+            step += 1  # Incrementa el contador de frames
 
     def run_animation(self):
         pygame.display.set_caption("Solucionador de Laberintos con Algoritmos Genéticos")  # Título de la ventana
