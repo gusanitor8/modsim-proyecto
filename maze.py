@@ -32,6 +32,15 @@ class MazeGenerator:
     def get_checkpoints(self):
         return set(self.checkpoints)
     
+    def get_maze_dict(self):
+        return {
+            "matrix": self.get_maze(),
+            "entry": self.get_entry(),
+            "exit": self.get_exit(),
+            "checkpoints": self.get_checkpoints(),
+            "solutions": {}
+        }
+    
     def get_matrix_dic(self, path=None):
         if path is not None:
             with open(path, 'rb') as file:
