@@ -1,5 +1,6 @@
 import random
 import matplotlib.pyplot as plt
+import pickle
 from constants import WALL, PATH
 
 class MazeGenerator:
@@ -30,6 +31,35 @@ class MazeGenerator:
     
     def get_checkpoints(self):
         return set(self.checkpoints)
+    
+    def get_matrix_dic(self, path=None):
+        if path is not None:
+            with open(path, 'rb') as file:
+                maze_dic = pickle.load(file)
+
+            return maze_dic
+
+        return {
+            "matrix": self.get_maze(),
+            "entry": self.get_entry(),
+            "exit": self.get_exit(),
+            "checkpoints": self.get_checkpoints(),
+            "solutions": {}        
+        }
+    
+    def save_maze(self, path='mazes/my_dict.pkl'):
+        my_dict = {
+            "matrix": self.get_maze(),
+            "entry": self.get_entry(),
+            "exit": self.get_exit(),
+            "checkpoints": self.get_checkpoints(),
+            "solutions": {}        
+        }
+
+        # Open a file in binary write mode
+        with open(path, 'wb') as file:
+            pickle.dump(my_dict, file)
+        
 
     def is_within_bounds(self, x, y):
         """Check if the coordinates are within the maze bounds."""

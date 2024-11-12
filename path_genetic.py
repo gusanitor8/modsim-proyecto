@@ -5,20 +5,28 @@ from constants import WALL, PATH, DIRECTIONS
 
 def fitness(path, maze):
     exit = maze["exit"]
-
-    path_len = len(path)
+    solutions = maze["solutions"]
+    
+    # We calculate the distance
     last_coordinate = path[-1]
-
     dist = distance(last_coordinate[0], last_coordinate[1], exit[0], exit[1])
 
-    return dist
-
-def mutation(path, maze):
-    maze_matrix = maze["matrix"]
-    entry = maze["entry"]       
+    # We penalize recurring solutions
+    if last_coordinate in solutions:
+        maze["solutions"][last_coordinate] += 1
+        return dist + maze["solutions"][last_coordinate]
     
+    else:
+        maze["solutions"][last_coordinate] = 0
+        return dist
+        
+
+def mutation(path, maze, mutation_rate):
+    maze_matrix = maze["matrix"]
+    entry = maze["entry"]           
+
     # We first pick where the mutations begins
-    beg = len(path)//2
+    beg = int(len(path) * (1 - mutation_rate))
     end = len(path)
 
     random_idx = random.randint(beg, end)

@@ -1,5 +1,5 @@
 class GeneticAlgorithm:
-    def __init__(self, init_population, environment, epochs:int, pop_size: int, fitness: callable, crossover: callable, mutation: callable):
+    def __init__(self, init_population, environment, mutation_rate: int, epochs:int, pop_size: int, fitness: callable, crossover: callable, mutation: callable):
         """_summary_
 
         Args:
@@ -18,6 +18,7 @@ class GeneticAlgorithm:
         self.crossover = crossover
         self.mutation = mutation
         self.pop_size = pop_size
+        self.mutation_rate = mutation_rate
         self.generations = []
         self.fit_history = []
     
@@ -31,6 +32,10 @@ class GeneticAlgorithm:
             population_fit = [self.fitness(x, self.environment) for x in population]
             # Add the fitness of the population to the fit_history list
             self.fit_history.append(population_fit)
+
+            # if we find a solution we stop
+            if any(num == 0 for num in population_fit):
+                break
 
             # Sort the population by fitness
             population.sort(key=lambda x: self.fitness(x, self.environment))
@@ -52,7 +57,7 @@ class GeneticAlgorithm:
             first_individual = population[individual_idx]
             second_individual = population[nxt_individual_idx]
             new_individual = self.crossover(first_individual, second_individual, self.environment)
-            new_individual = self.mutation(new_individual, self.environment)
+            new_individual = self.mutation(new_individual, self.environment, self.mutation_rate)
 
             new_generation.append(new_individual)
 
