@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 class GeneticAlgorithm:
     def __init__(self, init_population, environment, mutation_rate: int, epochs:int, pop_size: int, fitness: callable, crossover: callable, mutation: callable):
         """_summary_
@@ -30,7 +32,13 @@ class GeneticAlgorithm:
         # Add the initial population to the generations list
         self.generations.append(population)
 
+        # Progress Bar
+        progress_bar = tqdm(total=self.epochs, bar_format='{desc} -> {percentage:3.0f}%|{bar}| {n_fmt}/{total_fmt} genetarions [{elapsed}<{remaining}]')
+
         for epoch_no in range(self.epochs):
+            # Update the progress bar
+            progress_bar.set_description(f"EVOLUTION")
+            progress_bar.update(1)  # Increment the progress bar
             # Calculate the fitness for each individual once and store it
             population_fit = [(x, self.fitness(x, self.environment)) for x in population]
             
@@ -51,7 +59,7 @@ class GeneticAlgorithm:
                     solution_found = True
                     final_epoch = epoch_no
                     
-
+        progress_bar.close()
         return self.generations, self.fit_history, solution_found, final_epoch
 
 
