@@ -3,7 +3,7 @@ import random
 from constants import WALL, PATH, DIRECTIONS
 
 
-def fitness(path, maze, unoffensive=False):
+def fitness(path, maze):
     exit = maze["exit"]
     solutions = maze["solutions"]
     
@@ -36,6 +36,14 @@ def fitness_log(path, maze):
     last_coordinate = path[-1]
     dist = distance(last_coordinate[0], last_coordinate[1], exit[0], exit[1])
 
+    if dist == 0:
+        if last_coordinate in solutions:
+            maze["solutions"][last_coordinate] += 1
+        else:
+            maze["solutions"][last_coordinate] = 1
+
+        return 0 
+
     # Penalización logarítmica para soluciones recurrentes
     if last_coordinate in solutions:
         maze["solutions"][last_coordinate] += 1
@@ -55,6 +63,14 @@ def fitness_exp(path, maze, distance_factor=2):
     last_coordinate = path[-1]
     dist = distance(last_coordinate[0], last_coordinate[1], exit[0], exit[1]) ** distance_factor
 
+    if dist == 0:
+        if last_coordinate in solutions:
+            maze["solutions"][last_coordinate] += 1
+        else:
+            maze["solutions"][last_coordinate] = 1
+
+        return 0 
+
     # Penalización de soluciones recurrentes
     if last_coordinate in solutions:
         maze["solutions"][last_coordinate] += 1
@@ -71,6 +87,14 @@ def fitness_sqrt(path, maze):
     # We calculate the distance
     last_coordinate = path[-1]
     dist = distance(last_coordinate[0], last_coordinate[1], exit[0], exit[1])
+
+    if dist == 0:
+        if last_coordinate in solutions:
+            maze["solutions"][last_coordinate] += 1
+        else:
+            maze["solutions"][last_coordinate] = 1
+
+        return 0 
 
     # We penalize recurring solutions
     if last_coordinate in solutions:

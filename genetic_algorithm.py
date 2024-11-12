@@ -31,27 +31,27 @@ class GeneticAlgorithm:
         self.generations.append(population)
 
         for epoch_no in range(self.epochs):
-            # Add the fitness of the population to the fit_history list
-            population_fit = [self.fitness(x, self.environment) for x in population]
-            # Add the fitness of the population to the fit_history list
-            self.fit_history.append(population_fit)
+            # Calculate the fitness for each individual once and store it
+            population_fit = [(x, self.fitness(x, self.environment)) for x in population]
             
-            # Sort the population by fitness
-            population.sort(key=lambda x: self.fitness(x, self.environment))
-            population = population[:self.pop_size]
-            # Add the fitness of the population to the fit_history list
+            # Extract the fitness values and add them to fit_history
+            self.fit_history.append([fit for _, fit in population_fit])
+            
+            # Sort the population based on fitness (using the precomputed fitness values)
+            population_fit.sort(key=lambda x: x[1])
+            population = [x for x, _ in population_fit[:self.pop_size]]
+            
+            # Reproduce the population and add the new generation to generations list
             population = self.reproduce(population)
-            # Add the new population to the generations list
             self.generations.append(population)
 
-            if not stop_at_zero:
-                continue
+            if stop_at_zero:
+                # If any individual has a fitness of 0, we stop
+                if any(fit == 0 for _, fit in population_fit) and not solution_found:
+                    solution_found = True
+                    final_epoch = epoch_no
+                    
 
-            # if we find a solution we stop
-            if any(num == 0 for num in population_fit) and not solution_found:
-                solution_found = True
-                final_epoch = epoch_no                
-           
         return self.generations, self.fit_history, solution_found, final_epoch
 
 
