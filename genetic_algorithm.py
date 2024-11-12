@@ -55,7 +55,7 @@ class GeneticAlgorithm:
 
             if stop_at_zero:
                 # If any individual has a fitness of 0, we stop
-                if any(fit == 0 for _, fit in population_fit) and not solution_found:
+                if any(path[-1] == self.environment["exit"] for path, fit in population_fit) and not solution_found:
                     solution_found = True
                     final_epoch = epoch_no
                     

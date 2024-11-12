@@ -28,6 +28,31 @@ def fitness(path, maze):
         maze["solutions"][last_coordinate] = 1
         return dist
     
+def fitness_explore(path, maze):
+    exit = maze["exit"]
+    solutions = maze["solutions"]
+    
+    # We calculate the distance
+    last_coordinate = path[-1]
+    dist = distance(last_coordinate[0], last_coordinate[1], exit[0], exit[1])
+
+    if dist == 0:
+        if last_coordinate in solutions:
+            maze["solutions"][last_coordinate] += 1
+        else:
+            maze["solutions"][last_coordinate] = 1
+
+        return 0 - 99999
+
+    # We penalize recurring solutions
+    if last_coordinate in solutions:
+        maze["solutions"][last_coordinate] += 1
+        return dist * maze["solutions"][last_coordinate]
+    
+    else:
+        maze["solutions"][last_coordinate] = 1
+        return dist - 30
+    
 def fitness_log(path, maze):
     exit = maze["exit"]
     solutions = maze["solutions"]

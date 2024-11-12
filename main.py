@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     #random.seed(42)
     maze_gen = MazeGenerator(50,50)   
-    maze_dic = maze_gen.get_matrix_dic("mazes/my_dict.pkl")
+    maze_dic = maze_gen.get_matrix_dic("test_mazes/test1")
 
     # Cargar la data del laberinto desde el archivo
     maze_matrix = maze_dic["matrix"]
