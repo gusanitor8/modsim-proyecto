@@ -3,7 +3,7 @@ from maze import MazeGenerator
 from maze_drawer import matrix_to_image
 from path_generator import PathGenerator
 from genetic_algorithm import GeneticAlgorithm
-from path_genetic import fitness, mutation, crossover
+from gen_functions import fitness, mutation, crossover
 from animator import MazeSolver
 
 EPOCHS = 1000
@@ -33,7 +33,8 @@ if __name__ == "__main__":
 
     # Aplicar el algoritmo genético para encontrar la solución
     genetic = GeneticAlgorithm(paths, maze_dic, MUTATION_RATE, EPOCHS, POPULATION, fitness, crossover, mutation)
-    generations, fitness_history = genetic.run()
+    generations, fitness_history, solution_found, final_epoch = genetic.run()
+    print("solution_found!")
 
     # Mostrar solución en una ventana de Pygame
     pygame.init()

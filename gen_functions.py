@@ -3,7 +3,68 @@ import random
 from constants import WALL, PATH, DIRECTIONS
 
 
-def fitness(path, maze):
+def fitness(path, maze, unoffensive=False):
+    exit = maze["exit"]
+    solutions = maze["solutions"]
+    
+    # We calculate the distance
+    last_coordinate = path[-1]
+    dist = distance(last_coordinate[0], last_coordinate[1], exit[0], exit[1])
+
+    if dist == 0:
+        if last_coordinate in solutions:
+            maze["solutions"][last_coordinate] += 1
+        else:
+            maze["solutions"][last_coordinate] = 1
+
+        return 0 
+
+    # We penalize recurring solutions
+    if last_coordinate in solutions:
+        maze["solutions"][last_coordinate] += 1
+        return dist * maze["solutions"][last_coordinate]
+    
+    else:
+        maze["solutions"][last_coordinate] = 1
+        return dist
+    
+def fitness_log(path, maze):
+    exit = maze["exit"]
+    solutions = maze["solutions"]
+
+    # Calculamos la distancia
+    last_coordinate = path[-1]
+    dist = distance(last_coordinate[0], last_coordinate[1], exit[0], exit[1])
+
+    # Penalización logarítmica para soluciones recurrentes
+    if last_coordinate in solutions:
+        maze["solutions"][last_coordinate] += 1
+        recurrence_penalty = math.log(maze["solutions"][last_coordinate] + 1)
+        return dist + recurrence_penalty
+    
+    else:
+        maze["solutions"][last_coordinate] = 1
+        return dist
+    
+
+def fitness_exp(path, maze, distance_factor=2):
+    exit = maze["exit"]
+    solutions = maze["solutions"]
+
+    # Calculamos la distancia y la ajustamos con una función cuadrática
+    last_coordinate = path[-1]
+    dist = distance(last_coordinate[0], last_coordinate[1], exit[0], exit[1]) ** distance_factor
+
+    # Penalización de soluciones recurrentes
+    if last_coordinate in solutions:
+        maze["solutions"][last_coordinate] += 1
+        return dist + maze["solutions"][last_coordinate]
+    
+    else:
+        maze["solutions"][last_coordinate] = 1
+        return dist
+    
+def fitness_sqrt(path, maze):
     exit = maze["exit"]
     solutions = maze["solutions"]
     
@@ -14,10 +75,11 @@ def fitness(path, maze):
     # We penalize recurring solutions
     if last_coordinate in solutions:
         maze["solutions"][last_coordinate] += 1
-        return dist + maze["solutions"][last_coordinate]
+        rpt_sqrt = math.sqrt(maze["solutions"][last_coordinate])
+        return dist * rpt_sqrt + rpt_sqrt
     
     else:
-        maze["solutions"][last_coordinate] = 0
+        maze["solutions"][last_coordinate] = 1
         return dist
         
 

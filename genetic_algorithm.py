@@ -22,43 +22,46 @@ class GeneticAlgorithm:
         self.generations = []
         self.fit_history = []
     
-    def run(self):
+    def run(self, stop_at_zero=True):
         population = self.init_population
+        solution_found = False
+        final_epoch = self.epochs - 1
+
         # Add the initial population to the generations list
         self.generations.append(population)
 
-        for _ in range(self.epochs):
+        for epoch_no in range(self.epochs):
             # Add the fitness of the population to the fit_history list
             population_fit = [self.fitness(x, self.environment) for x in population]
             # Add the fitness of the population to the fit_history list
             self.fit_history.append(population_fit)
-
-            # if we find a solution we stop
-            if any(num == 0 for num in population_fit):
-                break
-
+            
             # Sort the population by fitness
             population.sort(key=lambda x: self.fitness(x, self.environment))
+            population = population[:self.pop_size]
             # Add the fitness of the population to the fit_history list
             population = self.reproduce(population)
             # Add the new population to the generations list
             self.generations.append(population)
+
+            if not stop_at_zero:
+                continue
+
+            # if we find a solution we stop
+            if any(num == 0 for num in population_fit) and not solution_found:
+                solution_found = True
+                final_epoch = epoch_no                
            
-        return self.generations, self.fit_history
+        return self.generations, self.fit_history, solution_found, final_epoch
 
 
-    def reproduce(self, population):
-        pop_len = len(population)
+    def reproduce(self, population):        
         new_generation = []
 
-        for individual_idx in range(len(population)):
-            nxt_individual_idx = (individual_idx + 1) % pop_len
-
-            first_individual = population[individual_idx]
-            second_individual = population[nxt_individual_idx]
-            new_individual = self.crossover(first_individual, second_individual, self.environment)
-            new_individual = self.mutation(new_individual, self.environment, self.mutation_rate)
+        for first_individual in population:                        
+            new_individual = self.mutation(first_individual, self.environment, self.mutation_rate)
 
             new_generation.append(new_individual)
+            new_generation.append(first_individual)
 
         return new_generation
